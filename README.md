@@ -1,0 +1,1 @@
+Simple neutral network with Tensorflow in Python and other data analysis/model building tools. Model allows to predict winner of League of Legends game, based on in-game data. More details can be found in description.txt, but only Polish version. 
