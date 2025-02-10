@@ -1,0 +1,107 @@
+ Projekt realizowany jest w kontekście gry League of Legends (branża e-sportowa),
+ która jest z rodzaju gier MOBA, wiele danych w trakcie gry zbierana jest przez
+ developerów np. do tworzenia algorytmów, które ulpeszą grę,
+  albo w najgorszym wypadku sprawią, że ciężko będzie przestać w nią grać.
+ Projekt ma na celu zbudowanie modelu do przewidywania wyniku gry,
+  na podstawie danych zebranych właśnie w trakcie gry.
+ Model może być użyteczny dla analityków e-sportowych,
+ streamerów oraz drużyn e-sportowych do optymalizacji strategii.
+ Interesujące dla mnie jest to, jak pozornie prosty model,
+ może w czasie rzeczywistym przewidywać wynik rozgrywki e-sportowej
+ na podstawie kilku wskaźników (takie modele już są stałą częścią gier zawodowych),
+ a jednak nadal zostaje pole do walki i model może się mylić
+ na korzyść drużyny przegrywającej, co niestety w aktualnym sezonie gry jest rzadkością,
+  ale nadal zdarza się, że drużyna spisana na straty,
+  potrafi w jedną chwile, obrócić losy rozgrywki.
+
+
+ Źródłem danych jest API producenta gry, zebrane w jednym dataset, oraz wstępnie przetworzone, aby pozbyć się wartości typu:
+  NaN, null czy inne braki. Do tego zostały uporządkowane przez autora zbioru,
+   więc w tej kwestii dane są wręcz idealne do dlaszej obróbki,
+    choć może się zdarzyć, że pominięto jakieś anomalie czy wartości odsunięte od normy pojawiły się w zbiorze.
+ Dane pochodzą bezpośrednio z rozgrywek graczy, zebrane są przez twórców gry,
+ więc wiarygodność nie podlega dyskusji tak długo, jak wierzymy, że ktoś sztucznie ich nie spreparował i nie podpisał się nazwą twórców gry.
+ Dane zwierają liczbowe statystki na temat kluczowych elementów rozgrywki obu drużyn.
+ Na bazie tych danych z dużą pewnością, już w pierwszych minutach gry
+ można ocenić kto wygra. Ze względu na całokształt rozgrywki,
+ to właśnie te dane są niezbędne, żeby przewidywać zwycięzce.
+ Jest tak, bo gra bazuje na systemie zdobywania złota i doświadczenia,
+ które sprawiają, że jesteś silniejszy niż przeciwnik, a za tym idzie fakt,
+ że pewnie wygrasz w krótkim czasie. Dodatkowo dane są zawierają długość trwania gry,
+ więc będzie można na własne oczy zobaczyć jak ważne są pierwsze etapy rozgrywki,
+ gdzie wczesna przewaga często prowadzi do szybkiej wygranej, natomiast dłuższe gry,
+  mogą być pełne zaskoczeń.
+
+ W tym projekcie celem było przewidzenie,
+ która drużyna wygra grę w League of Legends (czerwona czy niebieska),
+ bazując na danych statystycznych z rozgrywek.
+ Wybrany został model oparty na sieci neuronowej,
+ ponieważ dane wejściowe zawierają dużą ilość cech,
+ a sieci neuronowe dobrze radzą sobie
+ z analizą nieliniowych i złożonych relacji pomiędzy zmiennymi.
+
+ Wybrano sieć neuronową o następującej architekturze:
+ -- Warstwa wejściowa o liczbie neuronów równej liczbie kolumn po usnięciu nieznaczących kolumn.
+ -- Trzy ukryte warstwy:
+  - Pierwsza z 64 neuronami i funkcją aktywacji ReLU.
+  - Druga z 32 neuronami i funkcją aktywacji ReLU.
+  - Trzecia z 16 neuronami i funkcją aktywacji RelU.
+ -- Warstwa wyjściowa z jednym neuronem i funkcją aktywacji sigmoid,
+ aby wynikiem były prawdopodbieństwa wygrania obu drużyn (od 0 do 1).
+ -- Regularyzacja w postaci Dropout, aby uniknąć przeuczenia.
+
+ Model ten pozwala na skuteczne przewidywanie wyników w złożonym środowisku,
+ takim jak League of Legends, gdzie zależności pomiędzy cechami mogą być trudne
+ do wyłapania przez prostsze modele.
+
+ -- Wstępna analiza danych:
+    - Wczytanie danych.
+ -- Przygotowanie danych:
+    - Usunięcie brakujących wartości.
+    - Standaryzacja danych przy użyciu StandardScaler.
+ -- Modelowanie:
+    - Zbudowanie sieci neuronowej.
+    - Trening modelu z wykorzystaniem zestawu treningowego.
+ -- Ewaluacja:
+    - Obliczenie dokładności na zbiorze testowym.
+    - Wizualizacja metryk treningowych.
+    - Analiza wyników przy użyciu macierzy pomyłek i raportu klasyfikacji.
+
+
+ Miary ewaluacji modelu
+ - Dokładność (accuracy): Procent poprawnych predykcji w stosunku
+ do wszystkich przykładów.
+ - Macierz pomyłek: Do analizy błędnych klasyfikacji w podziale na klasy
+ (wygrana drużyna niebieska lub czerwona).
+ - Raport klasyfikacji: Zawiera precyzję, czułość (recall) i F1-score
+ dla każdej klasy.
+
+
+ Model osiągnął zadowalającą dokładność na zbiorze testowym (99%), a skorzystanie z
+wczesnego zatrzymania oraz redukowania wskaźnika uczenia się, pozwoliło ograniczyć przeuczenie.
+Zastosowanie dropoutu pozwoli na powstrzymanie overfittingu i model lepiej będzie generalizować się na nowe dane.
+
+ Celem projektu było zbudowanie modelu przewidującego wyniki gier League of Legends
+ na podstawie danych statystycznych z wielu rozgrywek. Jeżeli moje rozumowanie jest poprawne,
+  a testy wiarygodne to wierzę, że cel udało się osiągnąć, a wyniki mogą przydać się (po wielu zmianach i przeróbkach model doszedł do zaskakującego wysokiego wyniku):
+ -- Analitykom e-sportowym: Do analizy strategii drużyn.
+ -- Drużynom e-sportowym : Do optymalizacji stylu gry i podejmowania decyzji w trakcie meczu.
+ -- Fanom i streamerom: Do analizy wyników na żywo lub przewidywania wyników gier.
+
+ W kwestii ograniczeń modelu należy wspomieć o:
+ -- Dane historyczne mogą nie uwzględniać zmian w mechanice gry
+ (np. nowych postaci lub patchy, które wychodzą co dwa tygodnie).
+ - Model może być wrażliwy na brakujące dane lub nierównomierny rozkład klas.
+ - Złożoność modelu może ograniczyć jego interpretowalność
+ w kontekście indywidualnych cech wpływających na wyniki.
+ - Nie ma możliwości pobrać szczegółowych danych na temat zestawu drużyn
+ (często w trakcie wyboru postaci i innych "wspomagaczy",
+  jeszcze przed grą już ważą się losy wygranej,
+   ze względu na momentową siłe postaci w aktualnym patchu)
+   albo historii gier gracza (gracze na poziomie amatorskim popełniają wiele błędów
+    oraz mają tendecję do powielania przegrywających wzorców związanych z tym jak lubią grać) ,
+  a oba te aspkety mogłyby pomóc doprowadzić model do perfekcji.
+  - Na koniec pozostaje kwestia tego, że gdyby istniał idealny model, który zawsze poprawnie przewidzi zwycięzce,
+  wtedy oglądanie nie miałoby sensu,
+  a w ten sposób zostaje dreszczyk adrenaliny oraz wielkie nadzieję,
+   że np. ukochana drużyna e-sportowa jednak ma w tym roku szansę na 5-krotnego mistrza świata lub tym podobne.
